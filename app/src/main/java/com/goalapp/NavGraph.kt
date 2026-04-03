@@ -34,14 +34,34 @@ fun NavGraph(navController: NavHostController) {
         }
 
         composable(Screen.AddGoal.route) {
-            AddGoalScreen(onBack = { navController.popBackStack() })
+            AddGoalScreen(
+                onBack = { navController.popBackStack() },
+                onSaveSuccess = {
+                    val popped = navController.popBackStack(Screen.Home.route, inclusive = false)
+                    if (!popped) {
+                        navController.navigate(Screen.Home.route) {
+                            launchSingleTop = true
+                        }
+                    }
+                }
+            )
         }
 
         composable(
             route = Screen.GoalDetail.route,
             arguments = listOf(navArgument("goalId") { type = NavType.LongType })
         ) {
-            GoalDetailScreen(onBack = { navController.popBackStack() })
+            GoalDetailScreen(
+                onBack = { navController.popBackStack() },
+                onSaveProgressSuccess = {
+                    val popped = navController.popBackStack(Screen.Home.route, inclusive = false)
+                    if (!popped) {
+                        navController.navigate(Screen.Home.route) {
+                            launchSingleTop = true
+                        }
+                    }
+                }
+            )
         }
     }
 }

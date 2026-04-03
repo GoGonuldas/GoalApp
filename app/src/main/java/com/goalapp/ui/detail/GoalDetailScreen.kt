@@ -11,7 +11,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,6 +23,7 @@ import com.goalapp.ui.theme.parseColor
 @Composable
 fun GoalDetailScreen(
     onBack: () -> Unit,
+    onSaveProgressSuccess: () -> Unit,
     viewModel: GoalDetailViewModel = hiltViewModel()
 ) {
     val goal by viewModel.goal.collectAsStateWithLifecycle()
@@ -143,7 +143,7 @@ fun GoalDetailScreen(
                 Spacer(Modifier.weight(1f))
 
                 Button(
-                    onClick = { viewModel.updateProgress(sliderValue) },
+                    onClick = { viewModel.updateProgress(sliderValue, onSaved = onSaveProgressSuccess) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(54.dp),

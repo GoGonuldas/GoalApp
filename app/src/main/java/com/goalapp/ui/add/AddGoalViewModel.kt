@@ -22,6 +22,7 @@ class AddGoalViewModel @Inject constructor(
         onSuccess: () -> Unit
     ) {
         if (title.isBlank() || targetValue <= 0f) return
+
         viewModelScope.launch {
             repository.insertGoal(
                 GoalEntity(

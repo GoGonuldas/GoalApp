@@ -29,10 +29,11 @@ class GoalDetailViewModel @Inject constructor(
         }
     }
 
-    fun updateProgress(newValue: Float) {
+    fun updateProgress(newValue: Float, onSaved: () -> Unit = {}) {
         viewModelScope.launch {
             repository.updateProgress(goalId, newValue)
             _goal.value = repository.getGoalById(goalId)
+            onSaved()
         }
     }
 

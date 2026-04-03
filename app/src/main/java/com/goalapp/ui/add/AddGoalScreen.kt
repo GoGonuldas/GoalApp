@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.goalapp.ui.theme.parseColor
 
@@ -31,15 +32,22 @@ val PRESET_COLORS = listOf(
 @Composable
 fun AddGoalScreen(
     onBack: () -> Unit,
+    onSaveSuccess: () -> Unit,
     viewModel: AddGoalViewModel = hiltViewModel()
 ) {
+    fun parseTarget(input: String): Float? {
+        val normalized = input.trim().replace(',', '.')
+        return normalized.toFloatOrNull()
+    }
+
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var targetValueStr by remember { mutableStateOf("") }
     var unit by remember { mutableStateOf("") }
     var selectedColor by remember { mutableStateOf(PRESET_COLORS.first()) }
 
-    val isValid = title.isNotBlank() && (targetValueStr.toFloatOrNull() ?: 0f) > 0f
+    val parsedTarget = parseTarget(targetValueStr) ?: 0f
+    val isValid = title.isNotBlank() && parsedTarget > 0f
 
     Scaffold(
         topBar = {
@@ -130,7 +138,7 @@ fun AddGoalScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             if (hex == selectedColor) {
-                                Text("✓", color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold)
+                                Text("✓", color = Color.White, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -144,10 +152,12 @@ fun AddGoalScreen(
                     viewModel.saveGoal(
                         title = title,
                         description = description,
-                        targetValue = targetValueStr.toFloatOrNull() ?: 0f,
+                        targetValue = parsedTarget,
                         unit = unit,
                         colorHex = selectedColor,
-                        onSuccess = onBack
+                        onSuccess = {
+                            onSaveSuccess()
+                        }
                     )
                 },
                 enabled = isValid,
