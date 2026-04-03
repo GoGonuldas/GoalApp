@@ -1,0 +1,22 @@
+# Gradle
+.gradle/
+**/build/
+
+# Local configuration (SDK path, etc.)
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+
+# OS
+.DS_Store
+
+# JVM crash/heap dumps
+*.hprof
+java_pid*.hprof
+
+# Keystore files
+*.jks
+*.keystore
+
