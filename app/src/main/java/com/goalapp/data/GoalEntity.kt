@@ -13,7 +13,9 @@ data class GoalEntity(
     val unit: String = "",
     val colorHex: String = "#6650A4",
     val createdAt: Long = System.currentTimeMillis(),
-    val deadline: Long? = null
+    val deadline: Long? = null,
+    val isArchived: Boolean = false,
+    val archivedAt: Long? = null
 ) {
     val progressPercent: Float
         get() = if (targetValue > 0f)

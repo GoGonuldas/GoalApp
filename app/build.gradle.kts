@@ -21,7 +21,12 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            isCrunchPngs = false
         }
+    }
+    
+    androidResources {
+        noCompress += listOf("png")
     }
 
     compileOptions {

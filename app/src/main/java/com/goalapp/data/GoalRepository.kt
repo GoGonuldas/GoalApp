@@ -7,7 +7,17 @@ import javax.inject.Singleton
 @Singleton
 class GoalRepository @Inject constructor(private val dao: GoalDao) {
 
-    fun getAllGoals(): Flow<List<GoalEntity>> = dao.getAllGoals()
+    suspend fun getGoalCount(): Int = dao.getGoalCount()
+
+    suspend fun insertGoals(goals: List<GoalEntity>) = dao.insertGoals(goals)
+
+    fun getArchivedGoals(): Flow<List<GoalEntity>> = dao.getArchivedGoals()
+
+    fun getActiveGoalsForDay(startOfDayMillis: Long, endOfDayMillis: Long): Flow<List<GoalEntity>> =
+        dao.getActiveGoalsForDay(startOfDayMillis, endOfDayMillis)
+
+    suspend fun archiveGoalsBefore(startOfDayMillis: Long, archivedAtMillis: Long): Int =
+        dao.archiveGoalsBefore(startOfDayMillis, archivedAtMillis)
 
     suspend fun getGoalById(id: Long): GoalEntity? = dao.getGoalById(id)
 

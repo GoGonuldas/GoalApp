@@ -145,13 +145,13 @@ private fun EmptyState(
         Text("🎯", style = MaterialTheme.typography.displayMedium)
         Spacer(Modifier.height(16.dp))
         Text(
-            "Henüz hedefin yok",
+            "Bugun icin hedefin yok",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "İlk hedefini ekle ve ilerlemeyi takip et",
+            "Yeni gunluk hedefini ekle ve ilerlemeyi takip et",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
             textAlign = TextAlign.Center
