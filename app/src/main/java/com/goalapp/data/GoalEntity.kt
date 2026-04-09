@@ -15,7 +15,10 @@ data class GoalEntity(
     val createdAt: Long = System.currentTimeMillis(),
     val deadline: Long? = null,
     val isArchived: Boolean = false,
-    val archivedAt: Long? = null
+    val archivedAt: Long? = null,
+    val notificationEnabled: Boolean = false,
+    val notificationHour: Int? = null,  // 0-23
+    val notificationMinute: Int? = null  // 0-59
 ) {
     val progressPercent: Float
         get() = if (targetValue > 0f)

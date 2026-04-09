@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -57,6 +58,12 @@ fun AddGoalScreen(
     val today = remember { LocalDate.now(ZoneId.systemDefault()) }
     var selectedDate by remember { mutableStateOf(today) }
     var showDatePicker by remember { mutableStateOf(false) }
+    
+    // Bildirim için state'ler
+    var notificationEnabled by remember { mutableStateOf(false) }
+    var notificationHour by remember { mutableStateOf(9) }
+    var notificationMinute by remember { mutableStateOf(0) }
+    var showTimePicker by remember { mutableStateOf(false) }
 
     val parsedTarget = parseTarget(targetValueStr) ?: 0f
     val isValid = title.isNotBlank() && parsedTarget > 0f
@@ -160,6 +167,53 @@ fun AddGoalScreen(
                 }
             }
 
+            // Bildirim seçici
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Notifications,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                "Hatırlatıcı",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                        Switch(
+                            checked = notificationEnabled,
+                            onCheckedChange = { notificationEnabled = it }
+                        )
+                    }
+                    
+                    if (notificationEnabled) {
+                        Spacer(Modifier.height(12.dp))
+                        OutlinedButton(
+                            onClick = { showTimePicker = true },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Saat: %02d:%02d".format(notificationHour, notificationMinute))
+                        }
+                    }
+                }
+            }
+
             // Renk seçici
             Column {
                 Text(
@@ -213,6 +267,9 @@ fun AddGoalScreen(
                         unit = unit,
                         colorHex = selectedColor,
                         createdAt = createdAtMillis,
+                        notificationEnabled = notificationEnabled,
+                        notificationHour = if (notificationEnabled) notificationHour else null,
+                        notificationMinute = if (notificationEnabled) notificationMinute else null,
                         onSuccess = {
                             onSaveSuccess()
                         }
@@ -272,6 +329,39 @@ fun AddGoalScreen(
             ) {
                 DatePicker(state = datePickerState)
             }
+        }
+        
+        // TimePicker Dialog
+        if (showTimePicker) {
+            val timePickerState = rememberTimePickerState(
+                initialHour = notificationHour,
+                initialMinute = notificationMinute,
+                is24Hour = true
+            )
+            
+            AlertDialog(
+                onDismissRequest = { showTimePicker = false },
+                title = { Text("Hatırlatıcı Saati") },
+                text = {
+                    TimePicker(state = timePickerState)
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            notificationHour = timePickerState.hour
+                            notificationMinute = timePickerState.minute
+                            showTimePicker = false
+                        }
+                    ) {
+                        Text("Tamam")
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(onClick = { showTimePicker = false }) {
+                        Text("İptal")
+                    }
+                }
+            )
         }
     }
 }

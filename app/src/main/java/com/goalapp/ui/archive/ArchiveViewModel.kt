@@ -119,46 +119,70 @@ class ArchiveViewModel @Inject constructor(
         }
 
         return listOf(
-            // 1 gun once (4 Nisan)
-            goal("10.000 adim", 10000f, 8600f, "adim", "#006874", 1, 8, 10),
+            // 1 gün önce
+            goal("10.000 adım", 10000f, 8600f, "adım", "#006874", 1, 8, 10),
             goal("30 sayfa kitap", 30f, 30f, "sayfa", "#6650A4", 1, 9, 45),
             goal("2 litre su", 2f, 1.6f, "L", "#1B6299", 1, 11, 20),
 
-            // 2 gun once (3 Nisan)
+            // 2 gün önce
             goal("45 dk spor", 45f, 35f, "dk", "#B5264C", 2, 7, 50),
             goal("Meditasyon", 20f, 20f, "dk", "#006E2C", 2, 21, 5),
+            goal("Sabah koşusu", 5f, 5f, "km", "#7D5700", 2, 6, 30),
 
-            // 3 gun once (2 Nisan)
-            goal("8 km yuruyus", 8f, 6.2f, "km", "#7D5700", 3, 18, 30),
-            goal("Erken yat", 1f, 1f, "gun", "#6650A4", 3, 23, 15),
+            // 3 gün önce
+            goal("8 km yürüyüş", 8f, 6.2f, "km", "#7D5700", 3, 18, 30),
+            goal("Erken yat", 1f, 1f, "gün", "#6650A4", 3, 23, 15),
+            goal("Kitap oku", 50f, 42f, "sayfa", "#1B6299", 3, 20, 0),
 
-            // 4 gun once (1 Nisan)
-            goal("60 dk odak calisma", 60f, 52f, "dk", "#006874", 4, 10, 0),
-            goal("Gunluk yazma", 1f, 1f, "gun", "#1B6299", 4, 22, 10),
+            // 4 gün önce
+            goal("60 dk odak çalışma", 60f, 52f, "dk", "#006874", 4, 10, 0),
+            goal("Günlük yazma", 1f, 1f, "gün", "#1B6299", 4, 22, 10),
+            goal("3 öğün düzenli", 3f, 3f, "öğün", "#006E2C", 4, 19, 30),
 
-            // 5 gun once (31 Mart)
+            // 5 gün önce
             goal("Protein hedefi", 120f, 95f, "gr", "#B5264C", 5, 20, 40),
             goal("15 dk esneme", 15f, 12f, "dk", "#006E2C", 5, 7, 25),
+            goal("İngilizce pratik", 30f, 25f, "dk", "#6650A4", 5, 16, 0),
 
-            // 6 gun once (30 Mart)
-            goal("5 km kosu", 5f, 5f, "km", "#7D5700", 6, 6, 55),
-            goal("Ekran suresi azaltilsin", 3f, 2.2f, "saat", "#6650A4", 6, 23, 0),
+            // 6 gün önce
+            goal("5 km koşu", 5f, 5f, "km", "#7D5700", 6, 6, 55),
+            goal("Ekran süresi azaltılsın", 3f, 2.2f, "saat", "#6650A4", 6, 23, 0),
+            goal("Su içme", 2.5f, 2f, "L", "#1B6299", 6, 15, 20),
 
-            // 7 gun once (29 Mart)
+            // 7 gün önce
             goal("100 kelime ingilizce", 100f, 80f, "kelime", "#006874", 7, 19, 35),
             goal("20 sayfa teknik okuma", 20f, 20f, "sayfa", "#1B6299", 7, 21, 10),
+            goal("Vitamin al", 1f, 1f, "gün", "#006E2C", 7, 8, 0),
 
-            // 8 gun once (28 Mart)
-            goal("Yeni beceri ogren", 1f, 1f, "gun", "#006E2C", 8, 15, 0),
-            goal("Sebze tuketimi", 5f, 4f, "porsiyon", "#7D5700", 8, 19, 20),
+            // 8 gün önce
+            goal("Yeni beceri öğren", 1f, 1f, "gün", "#006E2C", 8, 15, 0),
+            goal("Sebze tüketimi", 5f, 4f, "porsiyon", "#7D5700", 8, 19, 20),
+            goal("Mola ver", 8f, 6f, "kez", "#B5264C", 8, 14, 30),
 
-            // 9 gun once (27 Mart)
+            // 9 gün önce
             goal("Yoga", 30f, 25f, "dk", "#B5264C", 9, 6, 30),
-            goal("Podcast dinle", 1f, 1f, "bolum", "#006874", 9, 14, 45),
+            goal("Podcast dinle", 1f, 1f, "bölüm", "#006874", 9, 14, 45),
+            goal("Temizlik yap", 1f, 0.8f, "saat", "#7D5700", 9, 10, 0),
 
-            // 10 gun once (26 Mart)
+            // 10 gün önce
             goal("Aile ile vakit", 2f, 2f, "saat", "#6650A4", 10, 18, 0),
-            goal("Gunluk rutin", 1f, 1f, "gun", "#1B6299", 10, 22, 30)
+            goal("Müzik dinle", 45f, 45f, "dk", "#006874", 10, 20, 15),
+
+            // 11 gün önce
+            goal("Sağlıklı kahvaltı", 1f, 1f, "gün", "#006E2C", 11, 7, 30),
+            goal("Telefon kullanımı azalt", 2f, 1.5f, "saat", "#B5264C", 11, 22, 0),
+
+            // 12 gün önce  
+            goal("Proje ilerlet", 3f, 2.5f, "saat", "#1B6299", 12, 14, 0),
+            goal("Nefes egzersizi", 10f, 10f, "dk", "#006E2C", 12, 12, 0),
+
+            // 13 gün önce
+            goal("Arkadaşla görüş", 1f, 1f, "gün", "#6650A4", 13, 19, 0),
+            goal("Film izle", 1f, 1f, "film", "#7D5700", 13, 21, 30),
+
+            // 14 gün önce
+            goal("Ders çalış", 90f, 75f, "dk", "#1B6299", 14, 16, 0),
+            goal("Organik gıda", 5f, 4f, "porsiyon", "#006E2C", 14, 13, 30)
         )
     }
 }
