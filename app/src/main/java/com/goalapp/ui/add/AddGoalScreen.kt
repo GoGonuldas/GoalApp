@@ -11,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,6 +23,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.goalapp.ui.theme.parseColor
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 val PRESET_COLORS = listOf(
     "#6650A4", "#B5264C", "#006874",
@@ -45,6 +52,11 @@ fun AddGoalScreen(
     var targetValueStr by remember { mutableStateOf("") }
     var unit by remember { mutableStateOf("") }
     var selectedColor by remember { mutableStateOf(PRESET_COLORS.first()) }
+    
+    // Tarih seçimi için state'ler
+    val today = remember { LocalDate.now(ZoneId.systemDefault()) }
+    var selectedDate by remember { mutableStateOf(today) }
+    var showDatePicker by remember { mutableStateOf(false) }
 
     val parsedTarget = parseTarget(targetValueStr) ?: 0f
     val isValid = title.isNotBlank() && parsedTarget > 0f
@@ -109,6 +121,45 @@ fun AddGoalScreen(
                 )
             }
 
+            // Tarih seçici
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showDatePicker = true }
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            "Hedef Tarihi",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = selectedDate.format(
+                                DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("tr"))
+                            ),
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    Icon(
+                        Icons.Default.CalendarToday,
+                        contentDescription = "Tarih seç",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
             // Renk seçici
             Column {
                 Text(
@@ -149,12 +200,19 @@ fun AddGoalScreen(
 
             Button(
                 onClick = {
+                    // Convert selected date to milliseconds at start of day
+                    val createdAtMillis = selectedDate
+                        .atStartOfDay(ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli()
+                    
                     viewModel.saveGoal(
                         title = title,
                         description = description,
                         targetValue = parsedTarget,
                         unit = unit,
                         colorHex = selectedColor,
+                        createdAt = createdAtMillis,
                         onSuccess = {
                             onSaveSuccess()
                         }
@@ -170,6 +228,50 @@ fun AddGoalScreen(
             }
 
             Spacer(Modifier.height(24.dp))
+        }
+        
+        // DatePicker Dialog
+        if (showDatePicker) {
+            val datePickerState = rememberDatePickerState(
+                initialSelectedDateMillis = selectedDate
+                    .atStartOfDay(ZoneOffset.UTC)
+                    .toInstant()
+                    .toEpochMilli(),
+                selectableDates = object : SelectableDates {
+                    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                        val date = Instant.ofEpochMilli(utcTimeMillis)
+                            .atZone(ZoneOffset.UTC)
+                            .toLocalDate()
+                        // Sadece bugün ve gelecek tarihler seçilebilir
+                        return !date.isBefore(today)
+                    }
+                }
+            )
+            
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            datePickerState.selectedDateMillis?.let { millis ->
+                                selectedDate = Instant.ofEpochMilli(millis)
+                                    .atZone(ZoneOffset.UTC)
+                                    .toLocalDate()
+                            }
+                            showDatePicker = false
+                        }
+                    ) {
+                        Text("Tamam")
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(onClick = { showDatePicker = false }) {
+                        Text("İptal")
+                    }
+                }
+            ) {
+                DatePicker(state = datePickerState)
+            }
         }
     }
 }

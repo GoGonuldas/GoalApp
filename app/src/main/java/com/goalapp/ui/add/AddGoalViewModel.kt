@@ -19,6 +19,7 @@ class AddGoalViewModel @Inject constructor(
         targetValue: Float,
         unit: String,
         colorHex: String,
+        createdAt: Long = System.currentTimeMillis(),
         onSuccess: () -> Unit
     ) {
         if (title.isBlank() || targetValue <= 0f) return
@@ -30,7 +31,8 @@ class AddGoalViewModel @Inject constructor(
                     description = description.trim(),
                     targetValue = targetValue,
                     unit = unit.trim(),
-                    colorHex = colorHex
+                    colorHex = colorHex,
+                    createdAt = createdAt
                 )
             )
             onSuccess()
