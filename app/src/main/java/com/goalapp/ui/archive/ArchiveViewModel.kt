@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,6 +25,29 @@ class ArchiveViewModel @Inject constructor(
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
+    /**
+     * UI State sarmalayıcısı - tüm UI ile ilgili state'leri tek yerde toplar
+     */
+    data class ArchiveUiState(
+        val availableDays: List<Long> = emptyList(),
+        val selectedDay: Long? = null,
+        val archivedGoals: List<GoalEntity> = emptyList(),
+        val isLoading: Boolean = true,
+        val error: String? = null,
+        val isEmpty: Boolean = true
+    ) {
+        /**
+         * Arşivde hiç hedef var mı?
+         */
+        val hasNoArchive: Boolean get() = !isLoading && availableDays.isEmpty() && error == null
+        
+        /**
+         * Seçili günde hedef var mı?
+         */
+        val hasNoGoalsForSelectedDay: Boolean get() = 
+            !isLoading && selectedDay != null && archivedGoals.isEmpty() && error == null
+    }
+
     private val allArchivedGoals: StateFlow<List<GoalEntity>> = repository
         .getArchivedGoals()
         .stateIn(
@@ -34,47 +56,58 @@ class ArchiveViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    val availableEpochDays: StateFlow<List<Long>> = allArchivedGoals
-        .map { goals ->
-            goals
-                .map { it.createdAt.toEpochDay() }
-                .distinct()
-                .sortedDescending()
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = emptyList()
-        )
-
     private val _selectedEpochDay = MutableStateFlow<Long?>(null)
+    private val _error = MutableStateFlow<String?>(null)
     
-    // Otomatik olarak ilk günü seç
-    val selectedEpochDay: StateFlow<Long?> = combine(
+    /**
+     * Tek bir UI State - Compose tarafından tek seferde observe edilir
+     */
+    val uiState: StateFlow<ArchiveUiState> = combine(
+        allArchivedGoals,
         _selectedEpochDay,
-        availableEpochDays
-    ) { selected, availableDays ->
-        when {
-            selected != null && selected in availableDays -> selected
+        _error
+    ) { goals, manuallySelected, error ->
+        // Hata varsa hata durumunu döndür
+        if (error != null) {
+            return@combine ArchiveUiState(
+                isLoading = false,
+                error = error,
+                isEmpty = goals.isEmpty()
+            )
+        }
+        
+        // Mevcut günleri hesapla
+        val availableDays = goals
+            .map { it.createdAt.toEpochDay() }
+            .distinct()
+            .sortedDescending()
+        
+        // Seçili günü belirle (manuel seçim yoksa ilk günü otomatik seç)
+        val selectedDay = when {
+            manuallySelected != null && manuallySelected in availableDays -> manuallySelected
             availableDays.isNotEmpty() -> availableDays.first()
             else -> null
         }
+        
+        // Seçili güne ait hedefleri filtrele
+        val filteredGoals = if (selectedDay != null) {
+            goals.filter { it.createdAt.toEpochDay() == selectedDay }
+        } else {
+            emptyList()
+        }
+        
+        ArchiveUiState(
+            availableDays = availableDays,
+            selectedDay = selectedDay,
+            archivedGoals = filteredGoals,
+            isLoading = false,
+            error = null,
+            isEmpty = goals.isEmpty()
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-        initialValue = null
-    )
-
-    val archivedGoals: StateFlow<List<GoalEntity>> = combine(
-        allArchivedGoals, 
-        selectedEpochDay
-    ) { goals, selected ->
-        if (selected == null) emptyList()
-        else goals.filter { it.createdAt.toEpochDay() == selected }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-        initialValue = emptyList()
+        initialValue = ArchiveUiState()
     )
 
     init {
@@ -88,16 +121,25 @@ class ArchiveViewModel @Inject constructor(
     private fun seedArchiveSampleDataIfNeeded() {
         viewModelScope.launch {
             try {
+                _error.value = null // Hatayı temizle
                 val existingCount = repository.getGoalCount()
                 if (existingCount > 0) return@launch
                 
                 // TODO: Production'da bu kodu kaldırın veya BuildConfig.DEBUG ile çevreleyın
                 repository.insertGoals(sampleGoalsProvider.buildArchiveSampleGoals())
             } catch (e: Exception) {
-                // Error handling - gerçek uygulamada loglama yapılmalı
+                // Hata durumunda UI'ya bildir
+                _error.value = "Örnek veriler yüklenirken bir hata oluştu: ${e.localizedMessage}"
                 e.printStackTrace()
             }
         }
+    }
+    
+    /**
+     * Hata mesajını temizler
+     */
+    fun clearError() {
+        _error.value = null
     }
 }
 

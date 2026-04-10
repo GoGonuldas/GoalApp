@@ -9,11 +9,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.goalapp.R
 import com.goalapp.data.GoalEntity
 import com.goalapp.ui.components.GoalCard
 
@@ -32,10 +34,10 @@ fun HomeScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Hedeflerim", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.home_title), fontWeight = FontWeight.Bold)
                         if (goals.isNotEmpty()) {
                             Text(
-                                "$completedCount / ${goals.size} tamamlandı",
+                                stringResource(R.string.home_completed_format, completedCount, goals.size),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                             )
@@ -51,7 +53,7 @@ fun HomeScreen(
             ExtendedFloatingActionButton(
                 onClick = onAddGoal,
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                text = { Text("Yeni Hedef") }
+                text = { Text(stringResource(R.string.home_new_goal)) }
             )
         }
     ) { padding ->
@@ -105,11 +107,11 @@ private fun SummaryCard(goals: List<GoalEntity>) {
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SummaryStat(label = "Toplam", value = "${goals.size}")
+            SummaryStat(label = stringResource(R.string.home_stats_total), value = "${goals.size}")
             VerticalDivider(modifier = Modifier.height(40.dp))
-            SummaryStat(label = "Tamamlanan", value = "${goals.count { it.isCompleted }}")
+            SummaryStat(label = stringResource(R.string.home_stats_completed), value = "${goals.count { it.isCompleted }}")
             VerticalDivider(modifier = Modifier.height(40.dp))
-            SummaryStat(label = "Ort. İlerleme", value = "${avgProgress.toInt()}%")
+            SummaryStat(label = stringResource(R.string.home_stats_avg_progress), value = "${avgProgress.toInt()}%")
         }
     }
 }
@@ -145,13 +147,13 @@ private fun EmptyState(
         Text("🎯", style = MaterialTheme.typography.displayMedium)
         Spacer(Modifier.height(16.dp))
         Text(
-            "Bugun icin hedefin yok",
+            stringResource(R.string.home_empty_title),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Yeni gunluk hedefini ekle ve ilerlemeyi takip et",
+            stringResource(R.string.home_empty_description),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
             textAlign = TextAlign.Center
@@ -160,7 +162,7 @@ private fun EmptyState(
         Button(onClick = onAddGoal) {
             Icon(Icons.Default.Add, contentDescription = null)
             Spacer(Modifier.width(8.dp))
-            Text("Hedef Ekle")
+            Text(stringResource(R.string.home_add_goal))
         }
     }
 }

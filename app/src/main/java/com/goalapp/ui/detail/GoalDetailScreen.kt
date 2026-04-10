@@ -11,12 +11,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.goalapp.R
 import com.goalapp.ui.theme.parseColor
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,14 +47,14 @@ fun GoalDetailScreen(
                     title = { Text(g.title, fontWeight = FontWeight.Bold) },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Geri")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.detail_back))
                         }
                     },
                     actions = {
                         IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(
                                 Icons.Default.Delete,
-                                contentDescription = "Sil",
+                                contentDescription = stringResource(R.string.detail_delete),
                                 tint = MaterialTheme.colorScheme.error
                             )
                         }
@@ -88,7 +90,10 @@ fun GoalDetailScreen(
                             color = color
                         )
                         Text(
-                            text = if (g.isCompleted) "Tamamlandı 🎉" else "Devam ediyor",
+                            text = if (g.isCompleted) 
+                                stringResource(R.string.detail_completed) 
+                            else 
+                                stringResource(R.string.detail_in_progress),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                         )
@@ -116,7 +121,7 @@ fun GoalDetailScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            "İlerlemeyi Güncelle",
+                            stringResource(R.string.detail_update_progress),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -150,7 +155,7 @@ fun GoalDetailScreen(
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = color)
                 ) {
-                    Text("Kaydet", fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.detail_save_progress), fontWeight = FontWeight.SemiBold)
                 }
             }
         }
@@ -158,18 +163,20 @@ fun GoalDetailScreen(
         if (showDeleteDialog) {
             AlertDialog(
                 onDismissRequest = { showDeleteDialog = false },
-                title = { Text("Hedefi Sil") },
-                text = { Text("\"${g.title}\" hedefini silmek istediğine emin misin? Bu işlem geri alınamaz.") },
+                title = { Text(stringResource(R.string.detail_delete_title)) },
+                text = { Text(stringResource(R.string.detail_delete_message)) },
                 confirmButton = {
                     TextButton(
                         onClick = { viewModel.deleteGoal(onBack) },
                         colors = ButtonDefaults.textButtonColors(
                             contentColor = MaterialTheme.colorScheme.error
                         )
-                    ) { Text("Sil") }
+                    ) { Text(stringResource(R.string.detail_delete_confirm)) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDeleteDialog = false }) { Text("İptal") }
+                    TextButton(onClick = { showDeleteDialog = false }) { 
+                        Text(stringResource(R.string.detail_delete_cancel)) 
+                    }
                 }
             )
         }

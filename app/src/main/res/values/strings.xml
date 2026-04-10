@@ -1,4 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Hedeflerim</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Anasayfa</string>
+    <string name="nav_archive">Arşiv</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">Hedeflerim</string>
+    <string name="home_completed_format">%1$d / %2$d tamamlandı</string>
+    <string name="home_new_goal">Yeni Hedef</string>
+    <string name="home_add_goal">Hedef Ekle</string>
+
+    <!-- Home Empty State -->
+    <string name="home_empty_title">Bugün için hedefin yok</string>
+    <string name="home_empty_description">Yeni günlük hedefini ekle ve ilerlemeyi takip et</string>
+
+    <!-- Home Summary -->
+    <string name="home_stats_total">Toplam</string>
+    <string name="home_stats_completed">Tamamlanan</string>
+    <string name="home_stats_avg_progress">Ort. İlerleme</string>
+
+    <!-- Archive Screen -->
+    <string name="archive_title">Arşiv</string>
+    <string name="archive_select_day">Gün seç</string>
+    <string name="archive_open_calendar">Takvim Aç</string>
+    <string name="archive_calendar_select">Seç</string>
+    <string name="archive_calendar_cancel">İptal</string>
+
+    <!-- Archive Empty States -->
+    <string name="archive_empty_title">Arşiv Boş</string>
+    <string name="archive_empty_subtitle">Henüz arşivlenmiş hedef yok.</string>
+    <string name="archive_empty_description">Yeni gün başladığında önceki hedefleriniz otomatik olarak buraya taşınır.</string>
+
+    <string name="archive_empty_day_title">Bu günde arşiv hedefi yok</string>
+    <string name="archive_empty_day_description">Farklı bir gün seçerek hedefleri görebilirsin.</string>
+
+    <!-- Archive Stats -->
+    <string name="archive_stats_total">Toplam</string>
+    <string name="archive_stats_completed">Tamamlanan</string>
+    <string name="archive_stats_avg_progress">Ort. İlerleme</string>
+
+    <!-- Add Goal Screen -->
+    <string name="add_goal_title">Yeni Hedef</string>
+    <string name="add_goal_back">Geri</string>
+    <string name="add_goal_title_field">Hedef başlığı *</string>
+    <string name="add_goal_description_field">Açıklama (opsiyonel)</string>
+    <string name="add_goal_target_field">Hedef değer *</string>
+    <string name="add_goal_unit_field">Birim</string>
+    <string name="add_goal_unit_placeholder">km, sayfa…</string>
+    <string name="add_goal_date_label">Hedef Tarihi</string>
+    <string name="add_goal_date_select">Tarih seç</string>
+    <string name="add_goal_notification_label">Hatırlatıcı</string>
+    <string name="add_goal_color_label">Renk seç</string>
+    <string name="add_goal_save">Hedefi Kaydet</string>
+
+    <!-- Detail Screen -->
+    <string name="detail_back">Geri</string>
+    <string name="detail_delete">Sil</string>
+    <string name="detail_completed">Tamamlandı 🎉</string>
+    <string name="detail_in_progress">Devam ediyor</string>
+    <string name="detail_update_progress">İlerlemeyi Güncelle</string>
+    <string name="detail_save_progress">Güncelle</string>
+    <string name="detail_delete_title">Hedefi Sil</string>
+    <string name="detail_delete_message">Bu hedefi silmek istediğinden emin misin?</string>
+    <string name="detail_delete_confirm">Sil</string>
+    <string name="detail_delete_cancel">İptal</string>
+
+    <!-- Error State -->
+    <string name="error_title">Hata Oluştu</string>
+    <string name="error_retry">Tekrar Dene</string>
 </resources>

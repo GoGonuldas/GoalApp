@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My Goals</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_archive">Archive</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">My Goals</string>
+    <string name="home_completed_format">%1$d / %2$d completed</string>
+    <string name="home_new_goal">New Goal</string>
+    <string name="home_add_goal">Add Goal</string>
+
+    <!-- Home Empty State -->
+    <string name="home_empty_title">No goals for today</string>
+    <string name="home_empty_description">Add a new daily goal and track your progress</string>
+
+    <!-- Home Summary -->
+    <string name="home_stats_total">Total</string>
+    <string name="home_stats_completed">Completed</string>
+    <string name="home_stats_avg_progress">Avg. Progress</string>
+
+    <!-- Archive Screen -->
+    <string name="archive_title">Archive</string>
+    <string name="archive_select_day">Select day</string>
+    <string name="archive_open_calendar">Open Calendar</string>
+    <string name="archive_calendar_select">Select</string>
+    <string name="archive_calendar_cancel">Cancel</string>
+
+    <!-- Archive Empty States -->
+    <string name="archive_empty_title">Archive is Empty</string>
+    <string name="archive_empty_subtitle">No archived goals yet.</string>
+    <string name="archive_empty_description">When a new day starts, your previous goals will be automatically moved here.</string>
+
+    <string name="archive_empty_day_title">No archived goals for this day</string>
+    <string name="archive_empty_day_description">You can view goals by selecting a different day.</string>
+
+    <!-- Archive Stats -->
+    <string name="archive_stats_total">Total</string>
+    <string name="archive_stats_completed">Completed</string>
+    <string name="archive_stats_avg_progress">Avg. Progress</string>
+
+    <!-- Add Goal Screen -->
+    <string name="add_goal_title">New Goal</string>
+    <string name="add_goal_back">Back</string>
+    <string name="add_goal_title_field">Goal title *</string>
+    <string name="add_goal_description_field">Description (optional)</string>
+    <string name="add_goal_target_field">Target value *</string>
+    <string name="add_goal_unit_field">Unit</string>
+    <string name="add_goal_unit_placeholder">km, pages…</string>
+    <string name="add_goal_date_label">Goal Date</string>
+    <string name="add_goal_date_select">Select date</string>
+    <string name="add_goal_notification_label">Reminder</string>
+    <string name="add_goal_color_label">Choose color</string>
+    <string name="add_goal_save">Save Goal</string>
+
+    <!-- Detail Screen -->
+    <string name="detail_back">Back</string>
+    <string name="detail_delete">Delete</string>
+    <string name="detail_completed">Completed 🎉</string>
+    <string name="detail_in_progress">In progress</string>
+    <string name="detail_update_progress">Update Progress</string>
+    <string name="detail_save_progress">Update</string>
+    <string name="detail_delete_title">Delete Goal</string>
+    <string name="detail_delete_message">Are you sure you want to delete this goal?</string>
+    <string name="detail_delete_confirm">Delete</string>
+    <string name="detail_delete_cancel">Cancel</string>
+
+    <!-- Error State -->
+    <string name="error_title">Error Occurred</string>
+    <string name="error_retry">Try Again</string>
+</resources>
+

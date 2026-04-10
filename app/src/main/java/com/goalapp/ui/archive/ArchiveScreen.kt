@@ -36,11 +36,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.goalapp.R
 import com.goalapp.data.GoalEntity
 import com.goalapp.ui.components.GoalCard
 import com.goalapp.util.toEpochDayFromUtcDate
@@ -56,115 +58,185 @@ fun ArchiveScreen(
     viewModel: ArchiveViewModel = hiltViewModel()
 ) {
     var showCalendarPicker by remember { mutableStateOf(false) }
-    val availableDays = viewModel.availableEpochDays.collectAsStateWithLifecycle().value
-    val selectedDay = viewModel.selectedEpochDay.collectAsStateWithLifecycle().value
-    val archivedGoals = viewModel.archivedGoals.collectAsStateWithLifecycle().value
+    
+    // ✨ Tek bir UI State - daha temiz ve performanslı!
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Arsiv", fontWeight = FontWeight.Bold) }
+                title = { Text(stringResource(R.string.archive_title), fontWeight = FontWeight.Bold) }
             )
         }
     ) { padding ->
-        if (availableDays.isEmpty()) {
+        // Loading State
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+            return@Scaffold
+        }
+        
+        // Error State
+        if (uiState.error != null) {
+            ErrorState(
+                error = uiState.error,
+                onRetry = { viewModel.clearError() },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+            )
+            return@Scaffold
+        }
+        
+        // Empty Archive State (hiç arşiv yok)
+        if (uiState.hasNoArchive) {
             EmptyArchiveState(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
             )
-        } else {
-            Column(
+            return@Scaffold
+        }
+        
+        // Content - Arşiv var
+        val availableDays = uiState.availableDays
+        val selectedDay = uiState.selectedDay
+        val archivedGoals = uiState.archivedGoals
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = padding.calculateTopPadding())
+        ) {
+            Row(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = padding.calculateTopPadding())
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
+                Text(
+                    text = selectedDay?.toDisplayDate() ?: stringResource(R.string.archive_select_day),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                OutlinedButton(onClick = { showCalendarPicker = true }) {
+                    Text(stringResource(R.string.archive_open_calendar))
+                }
+            }
+
+            if (uiState.hasNoGoalsForSelectedDay) {
+                EmptySelectedDayState(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = selectedDay?.toDisplayDate() ?: "Gun sec",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                    OutlinedButton(onClick = { showCalendarPicker = true }) {
-                        Text("Takvim Ac")
-                    }
-                }
-
-                if (archivedGoals.isEmpty()) {
-                    EmptySelectedDayState(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(horizontal = 32.dp)
-                    )
-                } else {
-                    ArchiveDaySummaryCard(
-                        goals = archivedGoals,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                    )
-                    
-                    LazyColumn(
-                        contentPadding = PaddingValues(
-                            start = 16.dp,
-                            end = 16.dp,
-                            top = 8.dp,
-                            bottom = padding.calculateBottomPadding() + 20.dp
-                        ),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(archivedGoals, key = { it.id }) { goal ->
-                            GoalCard(
-                                goal = goal,
-                                onClick = { onGoalClick(goal.id) }
-                            )
-                        }
-                    }
-                }
-            }
-
-            if (showCalendarPicker) {
-                val archivedDateMillis = availableDays.map { it.toUtcStartOfDayMillis() }.toSet()
-                
-                val selectableDates = object : SelectableDates {
-                    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                        return utcTimeMillis in archivedDateMillis
-                    }
-                }
-                
-                val datePickerState = rememberDatePickerState(
-                    initialSelectedDateMillis = selectedDay?.toUtcStartOfDayMillis(),
-                    selectableDates = selectableDates
+                        .fillMaxHeight()
+                        .padding(horizontal = 32.dp)
                 )
-                DatePickerDialog(
-                    onDismissRequest = { showCalendarPicker = false },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                val selectedMillis = datePickerState.selectedDateMillis
-                                if (selectedMillis != null) {
-                                    viewModel.selectDay(selectedMillis.toEpochDayFromUtcDate())
-                                }
-                                showCalendarPicker = false
-                            }
-                        ) {
-                            Text("Sec")
-                        }
-                    },
-                    dismissButton = {
-                        OutlinedButton(onClick = { showCalendarPicker = false }) {
-                            Text("Iptal")
-                        }
-                    }
+            } else {
+                ArchiveDaySummaryCard(
+                    goals = archivedGoals,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+                
+                LazyColumn(
+                    contentPadding = PaddingValues(
+                        start = 16.dp,
+                        end = 16.dp,
+                        top = 8.dp,
+                        bottom = padding.calculateBottomPadding() + 20.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    DatePicker(state = datePickerState)
+                    items(archivedGoals, key = { it.id }) { goal ->
+                        GoalCard(
+                            goal = goal,
+                            onClick = { onGoalClick(goal.id) }
+                        )
+                    }
                 }
             }
+        }
+
+        // Calendar Picker Dialog - Scaffold içinde
+        if (showCalendarPicker) {
+            val archivedDateMillis = availableDays.map { it.toUtcStartOfDayMillis() }.toSet()
+            
+            val selectableDates = object : SelectableDates {
+                override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                    return utcTimeMillis in archivedDateMillis
+                }
+            }
+            
+            val datePickerState = rememberDatePickerState(
+                initialSelectedDateMillis = selectedDay?.toUtcStartOfDayMillis(),
+                selectableDates = selectableDates
+            )
+            DatePickerDialog(
+                onDismissRequest = { showCalendarPicker = false },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            val selectedMillis = datePickerState.selectedDateMillis
+                            if (selectedMillis != null) {
+                                viewModel.selectDay(selectedMillis.toEpochDayFromUtcDate())
+                            }
+                            showCalendarPicker = false
+                        }
+                    ) {
+                        Text(stringResource(R.string.archive_calendar_select))
+                    }
+                },
+                dismissButton = {
+                    OutlinedButton(onClick = { showCalendarPicker = false }) {
+                        Text(stringResource(R.string.archive_calendar_cancel))
+                    }
+                }
+            ) {
+                DatePicker(state = datePickerState)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ErrorState(
+    error: String,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.padding(32.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            "⚠️",
+            style = MaterialTheme.typography.displayLarge,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        Text(
+            stringResource(R.string.error_title),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.error
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            error,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(24.dp))
+        Button(onClick = onRetry) {
+            Text(stringResource(R.string.error_retry))
         }
     }
 }
@@ -176,10 +248,14 @@ private fun EmptySelectedDayState(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Bu gunde arsiv hedefi yok", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Text(
+            stringResource(R.string.archive_empty_day_title),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold
+        )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Farkli bir gun secerek hedefleri gorebilirsin.",
+            stringResource(R.string.archive_empty_day_description),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
             textAlign = TextAlign.Center,
@@ -213,13 +289,13 @@ private fun ArchiveDaySummaryCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             StatItem(
-                label = "Toplam",
+                label = stringResource(R.string.archive_stats_total),
                 value = "$totalGoals",
                 modifier = Modifier.weight(1f)
             )
             
             StatItem(
-                label = "Tamamlanan",
+                label = stringResource(R.string.archive_stats_completed),
                 value = "$completedGoals",
                 modifier = Modifier.weight(1f)
             )
@@ -246,7 +322,7 @@ private fun ArchiveDaySummaryCard(
                     }
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "Ort. İlerleme",
+                        text = stringResource(R.string.archive_stats_avg_progress),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
                     )
@@ -282,7 +358,7 @@ private fun StatItem(
 }
 private fun Long.toDisplayDate(): String {
     val date = LocalDate.ofEpochDay(this)
-    val formatter = DateTimeFormatter.ofPattern("d MMMM", Locale("tr", "TR"))
+    val formatter = DateTimeFormatter.ofPattern("d MMMM", Locale.getDefault())
     return date.format(formatter)
 }
 
@@ -293,10 +369,26 @@ private fun EmptyArchiveState(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Arsiv bos", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        Text(
+            "📦",
+            style = MaterialTheme.typography.displayLarge,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        Text(
+            stringResource(R.string.archive_empty_title),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
         Spacer(Modifier.height(8.dp))
         Text(
-            "Yeni gun basladiginda onceki hedeflerin burada listelenir.",
+            stringResource(R.string.archive_empty_subtitle),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            stringResource(R.string.archive_empty_description),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
             textAlign = TextAlign.Center,

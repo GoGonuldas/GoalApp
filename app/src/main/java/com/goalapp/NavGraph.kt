@@ -3,6 +3,7 @@ package com.goalapp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Home
@@ -35,13 +36,13 @@ sealed class Screen(val route: String) {
 
 private data class BottomNavItem(
     val route: String,
-    val label: String,
+    val labelResId: Int,
     val icon: ImageVector
 )
 
 private val bottomNavItems = listOf(
-    BottomNavItem(route = Screen.Home.route, label = "Anasayfa", icon = Icons.Filled.Home),
-    BottomNavItem(route = Screen.Archive.route, label = "Arsiv", icon = Icons.Filled.Archive)
+    BottomNavItem(route = Screen.Home.route, labelResId = R.string.nav_home, icon = Icons.Filled.Home),
+    BottomNavItem(route = Screen.Archive.route, labelResId = R.string.nav_archive, icon = Icons.Filled.Archive)
 )
 
 @Composable
@@ -68,8 +69,8 @@ fun NavGraph(navController: NavHostController) {
                                     restoreState = true
                                 }
                             },
-                            icon = { Icon(item.icon, contentDescription = item.label) },
-                            label = { Text(item.label) }
+                            icon = { Icon(item.icon, contentDescription = stringResource(item.labelResId)) },
+                            label = { Text(stringResource(item.labelResId)) }
                         )
                     }
                 }

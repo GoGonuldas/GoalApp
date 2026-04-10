@@ -18,11 +18,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.goalapp.R
 import com.goalapp.ui.theme.parseColor
 import java.time.Instant
 import java.time.LocalDate
@@ -71,10 +73,10 @@ fun AddGoalScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Yeni Hedef", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.add_goal_title), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Geri")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.add_goal_back))
                     }
                 }
             )
@@ -92,7 +94,7 @@ fun AddGoalScreen(
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Hedef başlığı *") },
+                label = { Text(stringResource(R.string.add_goal_title_field)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
@@ -101,7 +103,7 @@ fun AddGoalScreen(
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
-                label = { Text("Açıklama (opsiyonel)") },
+                label = { Text(stringResource(R.string.add_goal_description_field)) },
                 maxLines = 3,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
@@ -111,7 +113,7 @@ fun AddGoalScreen(
                 OutlinedTextField(
                     value = targetValueStr,
                     onValueChange = { targetValueStr = it },
-                    label = { Text("Hedef değer *") },
+                    label = { Text(stringResource(R.string.add_goal_target_field)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                     modifier = Modifier.weight(1f),
@@ -120,8 +122,8 @@ fun AddGoalScreen(
                 OutlinedTextField(
                     value = unit,
                     onValueChange = { unit = it },
-                    label = { Text("Birim") },
-                    placeholder = { Text("km, sayfa…") },
+                    label = { Text(stringResource(R.string.add_goal_unit_field)) },
+                    placeholder = { Text(stringResource(R.string.add_goal_unit_placeholder)) },
                     singleLine = true,
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp)
@@ -146,14 +148,14 @@ fun AddGoalScreen(
                 ) {
                     Column {
                         Text(
-                            "Hedef Tarihi",
+                            stringResource(R.string.add_goal_date_label),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
                             text = selectedDate.format(
-                                DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("tr"))
+                                DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.getDefault())
                             ),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium
@@ -161,7 +163,7 @@ fun AddGoalScreen(
                     }
                     Icon(
                         Icons.Default.CalendarToday,
-                        contentDescription = "Tarih seç",
+                        contentDescription = stringResource(R.string.add_goal_date_select),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -182,8 +184,8 @@ fun AddGoalScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 Icons.Default.Notifications,
@@ -191,7 +193,7 @@ fun AddGoalScreen(
                                 tint = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                "Hatırlatıcı",
+                                stringResource(R.string.add_goal_notification_label),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Medium
                             )
@@ -217,7 +219,7 @@ fun AddGoalScreen(
             // Renk seçici
             Column {
                 Text(
-                    "Renk seç",
+                    stringResource(R.string.add_goal_color_label),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
@@ -281,7 +283,7 @@ fun AddGoalScreen(
                     .height(54.dp),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Hedefi Kaydet", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.add_goal_save), fontWeight = FontWeight.SemiBold)
             }
 
             Spacer(Modifier.height(24.dp))
