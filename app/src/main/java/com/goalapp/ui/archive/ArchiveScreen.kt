@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -44,9 +43,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.goalapp.data.GoalEntity
 import com.goalapp.ui.components.GoalCard
-import java.time.Instant
+import com.goalapp.util.toEpochDayFromUtcDate
+import com.goalapp.util.toUtcStartOfDayMillis
 import java.time.LocalDate
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -281,17 +280,11 @@ private fun StatItem(
         )
     }
 }
-
 private fun Long.toDisplayDate(): String {
-    val formatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.getDefault())
-    return LocalDate.ofEpochDay(this).format(formatter)
+    val date = LocalDate.ofEpochDay(this)
+    val formatter = DateTimeFormatter.ofPattern("d MMMM", Locale("tr", "TR"))
+    return date.format(formatter)
 }
-
-private fun Long.toUtcStartOfDayMillis(): Long =
-    LocalDate.ofEpochDay(this).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
-
-private fun Long.toEpochDayFromUtcDate(): Long =
-    Instant.ofEpochMilli(this).atZone(ZoneOffset.UTC).toLocalDate().toEpochDay()
 
 @Composable
 private fun EmptyArchiveState(modifier: Modifier = Modifier) {
