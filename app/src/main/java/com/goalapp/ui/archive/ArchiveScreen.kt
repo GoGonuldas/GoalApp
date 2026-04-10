@@ -356,10 +356,22 @@ private fun StatItem(
         )
     }
 }
+
+@Composable
 private fun Long.toDisplayDate(): String {
     val date = LocalDate.ofEpochDay(this)
-    val formatter = DateTimeFormatter.ofPattern("d MMMM", Locale.getDefault())
-    return date.format(formatter)
+    val today = LocalDate.now()
+    val daysDiff = java.time.temporal.ChronoUnit.DAYS.between(date, today).toInt()
+    
+    return when {
+        daysDiff == 0 -> stringResource(R.string.date_today)
+        daysDiff == 1 -> stringResource(R.string.date_yesterday)
+        daysDiff in 2..6 -> stringResource(R.string.date_days_ago, daysDiff)
+        else -> {
+            val formatter = DateTimeFormatter.ofPattern("d MMMM", Locale.getDefault())
+            date.format(formatter)
+        }
+    }
 }
 
 @Composable
