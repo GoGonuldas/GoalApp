@@ -41,6 +41,11 @@
     <string name="archive_stats_completed">Tamamlanan</string>
     <string name="archive_stats_avg_progress">Ort. İlerleme</string>
 
+    <!-- Weekly Productivity -->
+    <string name="weekly_productivity_title">Haftalık Özet</string>
+    <string name="weekly_productivity_subtitle">Son 7 gün</string>
+    <string name="today_label">Bugün</string>
+
     <!-- Date Format -->
     <string name="date_today">Bugün</string>
     <string name="date_yesterday">Dün</string>
@@ -71,6 +76,13 @@
     <string name="detail_delete_message">Bu hedefi silmek istediğinden emin misin?</string>
     <string name="detail_delete_confirm">Sil</string>
     <string name="detail_delete_cancel">İptal</string>
+
+    <!-- Goal Notes -->
+    <string name="detail_notes_title">Notlar</string>
+    <string name="detail_notes_empty">Henüz not eklenmemiş.</string>
+    <string name="detail_notes_hint">Hedef hakkında notlar ekle…</string>
+    <string name="detail_notes_save">Kaydet</string>
+    <string name="detail_notes_edit">Düzenle</string>
 
     <!-- Error State -->
     <string name="error_title">Hata Oluştu</string>

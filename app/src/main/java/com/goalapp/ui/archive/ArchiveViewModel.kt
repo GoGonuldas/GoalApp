@@ -32,6 +32,7 @@ class ArchiveViewModel @Inject constructor(
         val availableDays: List<Long> = emptyList(),
         val selectedDay: Long? = null,
         val archivedGoals: List<GoalEntity> = emptyList(),
+        val allArchivedGoals: List<GoalEntity> = emptyList(), // Haftalık grafik için
         val isLoading: Boolean = true,
         val error: String? = null,
         val isEmpty: Boolean = true
@@ -100,6 +101,7 @@ class ArchiveViewModel @Inject constructor(
             availableDays = availableDays,
             selectedDay = selectedDay,
             archivedGoals = filteredGoals,
+            allArchivedGoals = goals, // Tüm arşiv hedefleri - grafik için
             isLoading = false,
             error = null,
             isEmpty = goals.isEmpty()

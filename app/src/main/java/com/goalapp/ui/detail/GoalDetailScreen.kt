@@ -3,10 +3,13 @@ package com.goalapp.ui.detail
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -143,6 +146,94 @@ fun GoalDetailScreen(
                             )
                         )
                     }
+                }
+
+                // Notlar Bölümü
+                var showNotesDialog by remember { mutableStateOf(false) }
+                var notesText by remember { mutableStateOf(g.notes) }
+                
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                stringResource(R.string.detail_notes_title),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            IconButton(onClick = { showNotesDialog = true }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Edit,
+                                    contentDescription = stringResource(R.string.detail_notes_edit),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = if (g.notes.isBlank()) {
+                                stringResource(R.string.detail_notes_empty)
+                            } else {
+                                g.notes
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = if (g.notes.isBlank()) {
+                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                            } else {
+                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            }
+                        )
+                    }
+                }
+                
+                // Notlar Düzenleme Dialog
+                if (showNotesDialog) {
+                    AlertDialog(
+                        onDismissRequest = { 
+                            showNotesDialog = false
+                            notesText = g.notes // Reset
+                        },
+                        title = { Text(stringResource(R.string.detail_notes_title)) },
+                        text = {
+                            OutlinedTextField(
+                                value = notesText,
+                                onValueChange = { notesText = it },
+                                placeholder = { Text(stringResource(R.string.detail_notes_hint)) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                                maxLines = 10,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                        },
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    viewModel.updateNotes(notesText)
+                                    showNotesDialog = false
+                                }
+                            ) {
+                                Text(stringResource(R.string.detail_notes_save))
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { 
+                                showNotesDialog = false
+                                notesText = g.notes // Reset
+                            }) {
+                                Text(stringResource(R.string.detail_delete_cancel))
+                            }
+                        }
+                    )
                 }
 
                 Spacer(Modifier.weight(1f))

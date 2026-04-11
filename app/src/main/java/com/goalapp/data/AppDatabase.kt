@@ -37,5 +37,11 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE goals ADD COLUMN notificationMinute INTEGER")
             }
         }
+        
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE goals ADD COLUMN notes TEXT NOT NULL DEFAULT ''")
+            }
+        }
     }
 }

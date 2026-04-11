@@ -36,6 +36,16 @@ class GoalDetailViewModel @Inject constructor(
             onSaved()
         }
     }
+    
+    fun updateNotes(notes: String) {
+        viewModelScope.launch {
+            _goal.value?.let { currentGoal ->
+                val updatedGoal = currentGoal.copy(notes = notes)
+                repository.updateGoal(updatedGoal)
+                _goal.value = updatedGoal
+            }
+        }
+    }
 
     fun deleteGoal(onDeleted: () -> Unit) {
         viewModelScope.launch {

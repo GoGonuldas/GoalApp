@@ -108,12 +108,19 @@ fun ArchiveScreen(
         val availableDays = uiState.availableDays
         val selectedDay = uiState.selectedDay
         val archivedGoals = uiState.archivedGoals
+        val allArchivedGoals = uiState.allArchivedGoals
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = padding.calculateTopPadding())
         ) {
+            // Haftalık Görselleştirme - En üstte
+            WeeklyProductivityChart(
+                allArchivedGoals = allArchivedGoals,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+            
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
