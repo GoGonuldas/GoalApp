@@ -41,6 +41,26 @@
     <string name="archive_stats_completed">Completed</string>
     <string name="archive_stats_avg_progress">Avg. Progress</string>
 
+    <!-- Archive Bulk Actions -->
+    <string name="archive_edit_mode">Edit</string>
+    <string name="archive_edit_cancel">Cancel</string>
+    <string name="archive_selected_count">%d selected</string>
+    <string name="archive_delete_selected">Delete</string>
+    <string name="archive_move_selected">Move</string>
+    <string name="archive_select_all">Select All</string>
+    <string name="archive_deselect_all">Deselect All</string>
+    <string name="archive_delete_confirm_title">Delete Goals</string>
+    <string name="archive_delete_confirm_message">Are you sure you want to delete %d goals? This action cannot be undone.</string>
+    <string name="archive_move_dialog_title">Move Goals</string>
+    <string name="archive_move_dialog_message">Which date do you want to move %d goals to?</string>
+    <string name="archive_action_success_delete">%d goals deleted successfully</string>
+    <string name="archive_action_success_move">%d goals moved successfully</string>
+
+    <!-- Weekly Productivity -->
+    <string name="weekly_productivity_title">Weekly Summary</string>
+    <string name="weekly_productivity_subtitle">Last 7 days</string>
+    <string name="today_label">Today</string>
+
     <!-- Date Format -->
     <string name="date_today">Today</string>
     <string name="date_yesterday">Yesterday</string>
@@ -72,8 +92,14 @@
     <string name="detail_delete_confirm">Delete</string>
     <string name="detail_delete_cancel">Cancel</string>
 
+    <!-- Goal Notes -->
+    <string name="detail_notes_title">Notes</string>
+    <string name="detail_notes_empty">No notes added yet.</string>
+    <string name="detail_notes_hint">Add notes about the goal…</string>
+    <string name="detail_notes_save">Save</string>
+    <string name="detail_notes_edit">Edit</string>
+
     <!-- Error State -->
     <string name="error_title">Error Occurred</string>
     <string name="error_retry">Try Again</string>
 </resources>
-

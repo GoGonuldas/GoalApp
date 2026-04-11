@@ -143,5 +143,44 @@ class ArchiveViewModel @Inject constructor(
     fun clearError() {
         _error.value = null
     }
+    
+    /**
+     * Seçili hedefleri toplu olarak siler
+     */
+    fun deleteSelectedGoals(goalIds: List<Long>, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            try {
+                val deletedCount = repository.deleteGoalsByIds(goalIds)
+                if (deletedCount > 0) {
+                    onSuccess()
+                }
+            } catch (e: Exception) {
+                _error.value = "Hedefler silinirken hata oluştu: ${e.localizedMessage}"
+                e.printStackTrace()
+            }
+        }
+    }
+    
+    /**
+     * Seçili hedefleri başka bir güne taşır
+     */
+    fun moveSelectedGoalsToDate(goalIds: List<Long>, newEpochDay: Long, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            try {
+                // EpochDay'i milisaniyeye çevir (günün başlangıcı)
+                val zone = java.time.ZoneId.systemDefault()
+                val localDate = java.time.LocalDate.ofEpochDay(newEpochDay)
+                val newCreatedAt = localDate.atStartOfDay(zone).toInstant().toEpochMilli()
+                
+                val movedCount = repository.moveGoalsToDate(goalIds, newCreatedAt)
+                if (movedCount > 0) {
+                    onSuccess()
+                }
+            } catch (e: Exception) {
+                _error.value = "Hedefler taşınırken hata oluştu: ${e.localizedMessage}"
+                e.printStackTrace()
+            }
+        }
+    }
 }
 

@@ -36,6 +36,12 @@ interface GoalDao {
 
     @Delete
     suspend fun deleteGoal(goal: GoalEntity)
+    
+    @Query("DELETE FROM goals WHERE id IN (:goalIds)")
+    suspend fun deleteGoalsByIds(goalIds: List<Long>): Int
+    
+    @Query("UPDATE goals SET createdAt = :newCreatedAt WHERE id IN (:goalIds)")
+    suspend fun updateGoalsCreatedDate(goalIds: List<Long>, newCreatedAt: Long): Int
 
     @Query("UPDATE goals SET currentValue = :value WHERE id = :id")
     suspend fun updateProgress(id: Long, value: Float)

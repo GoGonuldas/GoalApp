@@ -28,4 +28,9 @@ class GoalRepository @Inject constructor(private val dao: GoalDao) {
     suspend fun updateProgress(id: Long, value: Float) = dao.updateProgress(id, value)
 
     suspend fun deleteGoal(goal: GoalEntity) = dao.deleteGoal(goal)
+    
+    suspend fun deleteGoalsByIds(goalIds: List<Long>): Int = dao.deleteGoalsByIds(goalIds)
+    
+    suspend fun moveGoalsToDate(goalIds: List<Long>, newCreatedAt: Long): Int = 
+        dao.updateGoalsCreatedDate(goalIds, newCreatedAt)
 }

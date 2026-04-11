@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -26,7 +28,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -45,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.goalapp.R
 import com.goalapp.data.GoalEntity
 import com.goalapp.ui.components.GoalCard
+import com.goalapp.ui.components.SelectableGoalCard
 import com.goalapp.util.toEpochDayFromUtcDate
 import com.goalapp.util.toUtcStartOfDayMillis
 import java.time.LocalDate
@@ -58,6 +63,10 @@ fun ArchiveScreen(
     viewModel: ArchiveViewModel = hiltViewModel()
 ) {
     var showCalendarPicker by remember { mutableStateOf(false) }
+    var isEditMode by remember { mutableStateOf(false) }
+    var selectedGoalIds by remember { mutableStateOf(setOf<Long>()) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showMoveDialog by remember { mutableStateOf(false) }
     
     // ✨ Tek bir UI State - daha temiz ve performanslı!
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -65,8 +74,54 @@ fun ArchiveScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.archive_title), fontWeight = FontWeight.Bold) }
+                title = { 
+                    Text(
+                        text = if (isEditMode && selectedGoalIds.isNotEmpty()) {
+                            stringResource(R.string.archive_selected_count, selectedGoalIds.size)
+                        } else {
+                            stringResource(R.string.archive_title)
+                        },
+                        fontWeight = FontWeight.Bold
+                    ) 
+                },
+                actions = {
+                    if (isEditMode) {
+                        // Düzenleme modundayken aksiyon butonları
+                        TextButton(onClick = { 
+                            isEditMode = false
+                            selectedGoalIds = setOf()
+                        }) {
+                            Text(stringResource(R.string.archive_edit_cancel))
+                        }
+                    } else if (!uiState.hasNoArchive && !uiState.hasNoGoalsForSelectedDay) {
+                        // Normal modda düzenle butonu
+                        TextButton(onClick = { isEditMode = true }) {
+                            Text(stringResource(R.string.archive_edit_mode))
+                        }
+                    }
+                }
             )
+        },
+        bottomBar = {
+            // Düzenleme modundayken ve seçili hedef varsa alt bar göster
+            if (isEditMode && selectedGoalIds.isNotEmpty()) {
+                ArchiveBulkActionsBar(
+                    selectedCount = selectedGoalIds.size,
+                    totalCount = uiState.archivedGoals.size,
+                    onSelectAll = {
+                        selectedGoalIds = uiState.archivedGoals.map { it.id }.toSet()
+                    },
+                    onDeselectAll = {
+                        selectedGoalIds = setOf()
+                    },
+                    onDelete = {
+                        showDeleteDialog = true
+                    },
+                    onMove = {
+                        showMoveDialog = true
+                    }
+                )
+            }
         }
     ) { padding ->
         // Loading State
@@ -161,10 +216,33 @@ fun ArchiveScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(archivedGoals, key = { it.id }) { goal ->
-                        GoalCard(
-                            goal = goal,
-                            onClick = { onGoalClick(goal.id) }
-                        )
+                        if (isEditMode) {
+                            SelectableGoalCard(
+                                goal = goal,
+                                isSelected = goal.id in selectedGoalIds,
+                                onSelectionChange = { selected ->
+                                    selectedGoalIds = if (selected) {
+                                        selectedGoalIds + goal.id
+                                    } else {
+                                        selectedGoalIds - goal.id
+                                    }
+                                },
+                                onClick = {
+                                    // Edit modunda karta tıklayınca seçim değişir
+                                    val isSelected = goal.id in selectedGoalIds
+                                    selectedGoalIds = if (isSelected) {
+                                        selectedGoalIds - goal.id
+                                    } else {
+                                        selectedGoalIds + goal.id
+                                    }
+                                }
+                            )
+                        } else {
+                            GoalCard(
+                                goal = goal,
+                                onClick = { onGoalClick(goal.id) }
+                            )
+                        }
                     }
                 }
             }
@@ -206,6 +284,82 @@ fun ArchiveScreen(
                 }
             ) {
                 DatePicker(state = datePickerState)
+            }
+        }
+        
+        // Delete Confirmation Dialog
+        if (showDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                title = { Text(stringResource(R.string.archive_delete_confirm_title)) },
+                text = { 
+                    Text(stringResource(R.string.archive_delete_confirm_message, selectedGoalIds.size))
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            viewModel.deleteSelectedGoals(selectedGoalIds.toList()) {
+                                // Başarılı silme sonrası
+                                selectedGoalIds = setOf()
+                                isEditMode = false
+                                showDeleteDialog = false
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Text(stringResource(R.string.detail_delete_confirm))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteDialog = false }) {
+                        Text(stringResource(R.string.detail_delete_cancel))
+                    }
+                }
+            )
+        }
+        
+        // Move to Date Dialog
+        if (showMoveDialog) {
+            val moveDatePickerState = rememberDatePickerState(
+                initialSelectedDateMillis = System.currentTimeMillis()
+            )
+            
+            DatePickerDialog(
+                onDismissRequest = { showMoveDialog = false },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            val selectedMillis = moveDatePickerState.selectedDateMillis
+                            if (selectedMillis != null) {
+                                val newEpochDay = selectedMillis.toEpochDayFromUtcDate()
+                                viewModel.moveSelectedGoalsToDate(selectedGoalIds.toList(), newEpochDay) {
+                                    // Başarılı taşıma sonrası
+                                    selectedGoalIds = setOf()
+                                    isEditMode = false
+                                    showMoveDialog = false
+                                }
+                            }
+                        }
+                    ) {
+                        Text(stringResource(R.string.archive_calendar_select))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showMoveDialog = false }) {
+                        Text(stringResource(R.string.detail_delete_cancel))
+                    }
+                }
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = stringResource(R.string.archive_move_dialog_message, selectedGoalIds.size),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    DatePicker(state = moveDatePickerState)
+                }
             }
         }
     }
@@ -416,3 +570,65 @@ private fun EmptyArchiveState(modifier: Modifier = Modifier) {
     }
 }
 
+/**
+ * Toplu işlem aksiyonları için alt bar
+ */
+@Composable
+private fun ArchiveBulkActionsBar(
+    selectedCount: Int,
+    totalCount: Int,
+    onSelectAll: () -> Unit,
+    onDeselectAll: () -> Unit,
+    onDelete: () -> Unit,
+    onMove: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = 3.dp
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+            // Tümünü seç/kaldır butonu
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                TextButton(
+                    onClick = if (selectedCount == totalCount) onDeselectAll else onSelectAll
+                ) {
+                    Text(
+                        text = if (selectedCount == totalCount) {
+                            stringResource(R.string.archive_deselect_all)
+                        } else {
+                            stringResource(R.string.archive_select_all)
+                        }
+                    )
+                }
+            }
+            
+            // Aksiyon butonları
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedButton(
+                    onClick = onMove,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.archive_move_selected))
+                }
+                
+                Button(
+                    onClick = onDelete,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text(stringResource(R.string.archive_delete_selected))
+                }
+            }
+        }
+    }
+}

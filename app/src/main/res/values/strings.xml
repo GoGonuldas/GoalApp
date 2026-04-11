@@ -41,6 +41,21 @@
     <string name="archive_stats_completed">Tamamlanan</string>
     <string name="archive_stats_avg_progress">Ort. İlerleme</string>
 
+    <!-- Archive Bulk Actions -->
+    <string name="archive_edit_mode">Düzenle</string>
+    <string name="archive_edit_cancel">İptal</string>
+    <string name="archive_selected_count">%d seçildi</string>
+    <string name="archive_delete_selected">Sil</string>
+    <string name="archive_move_selected">Taşı</string>
+    <string name="archive_select_all">Tümünü Seç</string>
+    <string name="archive_deselect_all">Seçimi Kaldır</string>
+    <string name="archive_delete_confirm_title">Hedefleri Sil</string>
+    <string name="archive_delete_confirm_message">%d hedefi silmek istediğinden emin misin? Bu işlem geri alınamaz.</string>
+    <string name="archive_move_dialog_title">Hedefleri Taşı</string>
+    <string name="archive_move_dialog_message">%d hedefi hangi tarihe taşımak istiyorsun?</string>
+    <string name="archive_action_success_delete">%d hedef başarıyla silindi</string>
+    <string name="archive_action_success_move">%d hedef başarıyla taşındı</string>
+
     <!-- Weekly Productivity -->
     <string name="weekly_productivity_title">Haftalık Özet</string>
     <string name="weekly_productivity_subtitle">Son 7 gün</string>
